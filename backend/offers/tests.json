@@ -1,0 +1,33 @@
+{
+  "tests": [
+    {
+      "name": "Get active offers",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "offers": []
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Create offer with admin auth",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-Admin-Auth": "admin123"
+      },
+      "body": {
+        "title": "Test Offer",
+        "description": "Test Description",
+        "reward": "100₽",
+        "telegram_link": "https://t.me/test"
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "message": "Offer created"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
