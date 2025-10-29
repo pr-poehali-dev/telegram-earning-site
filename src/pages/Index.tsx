@@ -12,6 +12,7 @@ interface Offer {
   description: string;
   reward: string;
   telegram_link: string;
+  views_count: number;
   created_at: string;
 }
 
@@ -88,6 +89,12 @@ const Index = () => {
       });
       fetchOffers();
     }
+  };
+
+  const handleOfferClick = async (id: number) => {
+    await fetch(`https://functions.poehali.dev/91b850a5-b60e-4115-8c7c-6741a57cceb9?id=${id}`, {
+      method: 'PUT'
+    });
   };
 
   return (
@@ -174,8 +181,14 @@ const Index = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-sm text-muted-foreground">{offer.description}</p>
+                {isAdmin && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Icon name="Eye" size={16} />
+                    <span>Просмотров: {offer.views_count}</span>
+                  </div>
+                )}
                 <div className="flex gap-2">
-                  <Button asChild className="flex-1">
+                  <Button asChild className="flex-1" onClick={() => handleOfferClick(offer.id)}>
                     <a href={offer.telegram_link} target="_blank" rel="noopener noreferrer">
                       <Icon name="ExternalLink" size={16} className="mr-2" />
                       Перейти

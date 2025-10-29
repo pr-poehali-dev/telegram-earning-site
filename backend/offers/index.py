@@ -44,6 +44,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'description': offer['description'],
                 'reward': offer['reward'],
                 'telegram_link': offer['telegram_link'],
+                'views_count': offer.get('views_count', 0),
                 'created_at': offer['created_at'].isoformat() if offer['created_at'] else None
             })
         
@@ -81,7 +82,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         telegram_link = body_data.get('telegram_link')
         
         cursor.execute(
-            "INSERT INTO offers (title, description, reward, telegram_link) VALUES (%s, %s, %s, %s) RETURNING id",
+            "INSERT INTO offers (title, description, reward, telegram_link, views_count) VALUES (%s, %s, %s, %s, 0) RETURNING id",
             (title, description, reward, telegram_link)
         )
         offer_id = cursor.fetchone()['id']
@@ -98,6 +99,26 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({'id': offer_id, 'message': 'Offer created'}),
             'isBase64Encoded': False
         }
+    
+    if method == 'PUT':
+        params = event.get('queryStringParameters', {})
+        offer_id = params.get('id')
+        
+        if offer_id:
+            cursor.execute("UPDATE offers SET views_count = views_count + 1 WHERE id = %s", (offer_id,))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({'message': 'View counted'}),
+                'isBase64Encoded': False
+            }
     
     if method == 'DELETE':
         headers = event.get('headers', {})

@@ -1,0 +1,1 @@
+ALTER TABLE offers ADD COLUMN views_count INTEGER DEFAULT 0;
